@@ -2,13 +2,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
 class OrderForm extends StatefulWidget {
-  const OrderForm({super.key});
+  final Map<String, dynamic>? existingOrder;
+  final int? index;
+
+  const OrderForm({this.existingOrder, this.index, super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _OrderFormState createState() => _OrderFormState();
+  State<OrderForm> createState() => _OrderFormState();
 }
 
 class _OrderFormState extends State<OrderForm> {
@@ -25,7 +28,6 @@ class _OrderFormState extends State<OrderForm> {
 
   double discount = 0.0;
   double netPrice = 0.0;
-
   DateTime selectedDate = DateTime.now();
 
   final List<String> flavors = ['Classic', 'Ube', 'Mango'];
@@ -37,10 +39,46 @@ class _OrderFormState extends State<OrderForm> {
     'Strawberry',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.existingOrder != null) {
+      final order = widget.existingOrder!;
+      selectedDate = DateTime.parse(order['date']);
+      selectedPayment = order['payment'];
+      orderNumberController.text = order['orderNumber'];
+      customerNameController.text = order['customerName'];
+      selectedMainFlavor = order['mainFlavor'];
+      selectedSize = order['size'];
+      selectedAdditionalFlavor = order['additionalFlavor'];
+      priceController.text = order['price'].toString();
+    } else {
+      autoGenerateOrderNumber();
+    }
+  }
+
   void calculatePrices() {
     double price = double.tryParse(priceController.text) ?? 0;
     discount = price * 0.20;
     netPrice = price - discount;
+  }
+
+  Future<void> autoGenerateOrderNumber() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ordersString = prefs.getString('taho_orders');
+
+    if (ordersString != null) {
+      final orders = List<Map<String, dynamic>>.from(jsonDecode(ordersString));
+      final lastOrder = orders.isNotEmpty ? orders.last : null;
+      int lastNumber = 0;
+      if (lastOrder != null) {
+        lastNumber = int.tryParse(lastOrder['orderNumber']) ?? 0;
+      }
+      orderNumberController.text = (lastNumber + 1).toString().padLeft(4, '0');
+    } else {
+      orderNumberController.text = '0001';
+    }
   }
 
   Future<void> saveOrder() async {
@@ -66,7 +104,14 @@ class _OrderFormState extends State<OrderForm> {
       orderList = List<Map<String, dynamic>>.from(jsonDecode(existingOrders));
     }
 
-    orderList.add(orderData);
+    if (widget.index != null) {
+      // Editing existing
+      orderList[widget.index!] = orderData;
+    } else {
+      // New order
+      orderList.add(orderData);
+    }
+
     await prefs.setString('taho_orders', jsonEncode(orderList));
   }
 
@@ -76,155 +121,158 @@ class _OrderFormState extends State<OrderForm> {
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Date: ${DateFormat.yMd().format(selectedDate)}"),
-          const SizedBox(height: 10),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Date: ${DateFormat.yMd().format(selectedDate)}"),
+            const SizedBox(height: 10),
 
-          Text("Payment Method:"),
-          Row(
-            children: [
-              Radio(
-                value: 'Cash',
-                groupValue: selectedPayment,
-                onChanged: (value) {
-                  setState(() => selectedPayment = value.toString());
-                },
-              ),
-              Text('Cash'),
-              Radio(
-                value: 'GCash',
-                groupValue: selectedPayment,
-                onChanged: (value) {
-                  setState(() => selectedPayment = value.toString());
-                },
-              ),
-              Text('GCash'),
-            ],
-          ),
+            Text("Payment Method:"),
+            Row(
+              children: [
+                Radio(
+                  value: 'Cash',
+                  groupValue: selectedPayment,
+                  onChanged: (value) {
+                    setState(() => selectedPayment = value.toString());
+                  },
+                ),
+                const Text('Cash'),
+                Radio(
+                  value: 'GCash',
+                  groupValue: selectedPayment,
+                  onChanged: (value) {
+                    setState(() => selectedPayment = value.toString());
+                  },
+                ),
+                const Text('GCash'),
+              ],
+            ),
 
-          TextField(
-            controller: orderNumberController,
-            decoration: InputDecoration(labelText: 'Order Number'),
-          ),
+            TextField(
+              controller: orderNumberController,
+              decoration: const InputDecoration(labelText: 'Order Number'),
+              readOnly: true,
+            ),
 
-          TextField(
-            controller: customerNameController,
-            decoration: InputDecoration(labelText: 'Customer Name'),
-          ),
+            TextField(
+              controller: customerNameController,
+              decoration: const InputDecoration(labelText: 'Customer Name'),
+            ),
 
-          const SizedBox(height: 20),
-          Text(
-            "Product Details",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+            const SizedBox(height: 20),
+            const Text(
+              "Product Details",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
 
-          DropdownButtonFormField(
-            value: selectedMainFlavor,
-            decoration: InputDecoration(labelText: "Main Flavor"),
-            items: flavors
-                .map(
-                  (flavor) =>
-                      DropdownMenuItem(value: flavor, child: Text(flavor)),
-                )
-                .toList(),
-            onChanged: (value) {
-              setState(() => selectedMainFlavor = value.toString());
-            },
-          ),
+            DropdownButtonFormField(
+              value: selectedMainFlavor,
+              decoration: const InputDecoration(labelText: "Main Flavor"),
+              items: flavors.map((flavor) {
+                return DropdownMenuItem(value: flavor, child: Text(flavor));
+              }).toList(),
+              onChanged: (value) {
+                setState(() => selectedMainFlavor = value.toString());
+              },
+            ),
 
-          DropdownButtonFormField(
-            value: selectedSize,
-            decoration: InputDecoration(labelText: "Size"),
-            items: sizes
-                .map((size) => DropdownMenuItem(value: size, child: Text(size)))
-                .toList(),
-            onChanged: (value) {
-              setState(() => selectedSize = value.toString());
-            },
-          ),
+            DropdownButtonFormField(
+              value: selectedSize,
+              decoration: const InputDecoration(labelText: "Size"),
+              items: sizes.map((size) {
+                return DropdownMenuItem(value: size, child: Text(size));
+              }).toList(),
+              onChanged: (value) {
+                setState(() => selectedSize = value.toString());
+              },
+            ),
 
-          DropdownButtonFormField(
-            value: selectedAdditionalFlavor,
-            decoration: InputDecoration(labelText: "Additional Flavor"),
-            items: additionalFlavors
-                .map(
-                  (flavor) =>
-                      DropdownMenuItem(value: flavor, child: Text(flavor)),
-                )
-                .toList(),
-            onChanged: (value) {
-              setState(() => selectedAdditionalFlavor = value.toString());
-            },
-          ),
+            DropdownButtonFormField(
+              value: selectedAdditionalFlavor,
+              decoration: const InputDecoration(labelText: "Additional Flavor"),
+              items: additionalFlavors.map((flavor) {
+                return DropdownMenuItem(value: flavor, child: Text(flavor));
+              }).toList(),
+              onChanged: (value) {
+                setState(() => selectedAdditionalFlavor = value.toString());
+              },
+            ),
 
-          const SizedBox(height: 20),
-          Text("Pricing", style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            const Text(
+              "Pricing",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
 
-          TextField(
-            controller: priceController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: "Price (₱)"),
-            onChanged: (value) {
-              setState(() {
-                calculatePrices();
-              });
-            },
-          ),
-
-          const SizedBox(height: 10),
-
-          Text("SC/PWD Discount (20%): ₱${discount.toStringAsFixed(2)}"),
-          Text("Net Price: ₱${netPrice.toStringAsFixed(2)}"),
-
-          const SizedBox(height: 20),
-
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () async {
-                if (orderNumberController.text.isEmpty ||
-                    customerNameController.text.isEmpty ||
-                    priceController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please fill out all fields.")),
-                  );
-                  return;
-                }
-
-                await saveOrder();
-
-                showDialog(
-                  // ignore: use_build_context_synchronously
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text("Order Submitted"),
-                    content: Text("Thank you, ${customerNameController.text}!"),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("OK"),
-                      ),
-                    ],
-                  ),
-                );
-
-                // Clear fields
+            TextField(
+              controller: priceController,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+              ],
+              decoration: const InputDecoration(labelText: "Price (₱)"),
+              onChanged: (value) {
                 setState(() {
-                  orderNumberController.clear();
-                  customerNameController.clear();
-                  priceController.clear();
-                  selectedMainFlavor = 'Classic';
-                  selectedSize = 'Small';
-                  selectedAdditionalFlavor = 'None';
-                  selectedPayment = 'Cash';
+                  calculatePrices();
                 });
               },
-              child: Text("PLACE TAHO ORDER"),
             ),
-          ),
-        ],
+
+            const SizedBox(height: 10),
+            Text("SC/PWD Discount (20%): ₱${discount.toStringAsFixed(2)}"),
+            Text("Net Price: ₱${netPrice.toStringAsFixed(2)}"),
+
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (orderNumberController.text.isEmpty ||
+                      customerNameController.text.isEmpty ||
+                      priceController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Please fill out all fields."),
+                      ),
+                    );
+                    return;
+                  }
+
+                  await saveOrder();
+
+                  showDialog(
+                    // ignore: use_build_context_synchronously
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Order Saved"),
+                      content: Text(
+                        widget.existingOrder != null
+                            ? "Order #${orderNumberController.text} updated."
+                            : "Order placed successfully!",
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context); // close dialog
+                            Navigator.pop(context); // go back to view screen
+                          },
+                          child: const Text("OK"),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Text(
+                  widget.existingOrder != null
+                      ? "UPDATE ORDER"
+                      : "PLACE TAHO ORDER",
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

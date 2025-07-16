@@ -97,6 +97,9 @@ class _ViewOrdersScreenState extends State<ViewOrdersScreen> {
                           "Flavor: ${order['mainFlavor']} | Size: ${order['size']}",
                         ),
                         Text("Payment: ${order['payment']}"),
+                        if (order['payment'] == 'GCash' &&
+                            order['gcashRef'] != null)
+                          Text("GCash Ref: ${order['gcashRef']}"),
                       ],
                     ),
                     isThreeLine: true,

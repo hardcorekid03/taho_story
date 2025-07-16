@@ -15,34 +15,44 @@ class OrderForm extends StatefulWidget {
 }
 
 class _OrderFormState extends State<OrderForm> {
-  // Controllers
   final TextEditingController orderNumberController = TextEditingController();
   final TextEditingController customerNameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
+  final TextEditingController gcashRefController = TextEditingController();
 
-  // Form Values
   String selectedPayment = 'Cash';
-  String selectedMainFlavor = 'Classic';
-  String selectedSize = 'Small';
-  String selectedAdditionalFlavor = 'None';
+  String selectedMainFlavor = 'KLASIKONG TAHO';
+  String selectedSize = 'MC-B1T1';
+  String selectedTakeOneFlavor = 'KLASIKONG TAHO';
+  bool isBuyOneTakeOne = false;
 
   double discount = 0.0;
   double netPrice = 0.0;
   DateTime selectedDate = DateTime.now();
 
-  final List<String> flavors = ['Classic', 'Ube', 'Mango'];
-  final List<String> sizes = ['Small', 'Medium', 'Large'];
-  final List<String> additionalFlavors = [
-    'None',
-    'Ube Syrup',
-    'Chocolate',
-    'Strawberry',
+  final List<String> flavors = [
+    'KLASIKONG TAHO',
+    'BANANANUT',
+    'UBE DE LECHE',
+    'LA PRESAS',
+    'OREOHOLIC',
+    'PRUTAS OVERLOAD',
+    'AVOCADO LOCO',
+    'MANGGA GRAHAM',
+    'COFFEE GELMOND',
+    'DIRTY MATCHARLIE',
+    'SALTED CARAMEL',
+    'ESTRAWBERRY COFFEE',
+    'SPICED MICO LATTE',
+    'SALTED BANOFFEE JOSH',
+    "PAU'S BISCOFF",
   ];
+
+  final List<String> sizes = ['MC-B1T1', 'MM', 'M'];
 
   @override
   void initState() {
     super.initState();
-
     if (widget.existingOrder != null) {
       final order = widget.existingOrder!;
       selectedDate = DateTime.parse(order['date']);
@@ -51,8 +61,10 @@ class _OrderFormState extends State<OrderForm> {
       customerNameController.text = order['customerName'];
       selectedMainFlavor = order['mainFlavor'];
       selectedSize = order['size'];
-      selectedAdditionalFlavor = order['additionalFlavor'];
+      isBuyOneTakeOne = order['isB1T1'] ?? false;
+      selectedTakeOneFlavor = order['takeOneFlavor'] ?? flavors[0];
       priceController.text = order['price'].toString();
+      gcashRefController.text = order['gcashRef'] ?? '';
     } else {
       autoGenerateOrderNumber();
     }
@@ -67,7 +79,6 @@ class _OrderFormState extends State<OrderForm> {
   Future<void> autoGenerateOrderNumber() async {
     final prefs = await SharedPreferences.getInstance();
     final ordersString = prefs.getString('taho_orders');
-
     if (ordersString != null) {
       final orders = List<Map<String, dynamic>>.from(jsonDecode(ordersString));
       final lastOrder = orders.isNotEmpty ? orders.last : null;
@@ -87,11 +98,13 @@ class _OrderFormState extends State<OrderForm> {
     Map<String, dynamic> orderData = {
       'date': selectedDate.toIso8601String(),
       'payment': selectedPayment,
+      'gcashRef': selectedPayment == 'GCash' ? gcashRefController.text : null,
       'orderNumber': orderNumberController.text,
       'customerName': customerNameController.text,
       'mainFlavor': selectedMainFlavor,
       'size': selectedSize,
-      'additionalFlavor': selectedAdditionalFlavor,
+      'isB1T1': isBuyOneTakeOne,
+      'takeOneFlavor': isBuyOneTakeOne ? selectedTakeOneFlavor : null,
       'price': double.tryParse(priceController.text) ?? 0,
       'discount': discount,
       'netPrice': netPrice,
@@ -105,14 +118,36 @@ class _OrderFormState extends State<OrderForm> {
     }
 
     if (widget.index != null) {
-      // Editing existing
       orderList[widget.index!] = orderData;
     } else {
-      // New order
       orderList.add(orderData);
     }
 
     await prefs.setString('taho_orders', jsonEncode(orderList));
+  }
+
+  void showGCashDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Enter GCash Reference Number"),
+        content: TextField(
+          controller: gcashRefController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(hintText: "e.g., 123456789012"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Save"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -143,7 +178,10 @@ class _OrderFormState extends State<OrderForm> {
                   value: 'GCash',
                   groupValue: selectedPayment,
                   onChanged: (value) {
-                    setState(() => selectedPayment = value.toString());
+                    setState(() {
+                      selectedPayment = value.toString();
+                      showGCashDialog();
+                    });
                   },
                 ),
                 const Text('GCash'),
@@ -152,8 +190,8 @@ class _OrderFormState extends State<OrderForm> {
 
             TextField(
               controller: orderNumberController,
-              decoration: const InputDecoration(labelText: 'Order Number'),
               readOnly: true,
+              decoration: const InputDecoration(labelText: 'Order Number'),
             ),
 
             TextField(
@@ -189,16 +227,27 @@ class _OrderFormState extends State<OrderForm> {
               },
             ),
 
-            DropdownButtonFormField(
-              value: selectedAdditionalFlavor,
-              decoration: const InputDecoration(labelText: "Additional Flavor"),
-              items: additionalFlavors.map((flavor) {
-                return DropdownMenuItem(value: flavor, child: Text(flavor));
-              }).toList(),
+            SwitchListTile(
+              title: const Text("Buy 1 Take 1"),
+              value: isBuyOneTakeOne,
               onChanged: (value) {
-                setState(() => selectedAdditionalFlavor = value.toString());
+                setState(() {
+                  isBuyOneTakeOne = value;
+                });
               },
             ),
+
+            if (isBuyOneTakeOne)
+              DropdownButtonFormField(
+                value: selectedTakeOneFlavor,
+                decoration: const InputDecoration(labelText: "Take 1 Flavor"),
+                items: flavors.map((flavor) {
+                  return DropdownMenuItem(value: flavor, child: Text(flavor));
+                }).toList(),
+                onChanged: (value) {
+                  setState(() => selectedTakeOneFlavor = value.toString());
+                },
+              ),
 
             const SizedBox(height: 20),
             const Text(
@@ -231,10 +280,12 @@ class _OrderFormState extends State<OrderForm> {
                 onPressed: () async {
                   if (orderNumberController.text.isEmpty ||
                       customerNameController.text.isEmpty ||
-                      priceController.text.isEmpty) {
+                      priceController.text.isEmpty ||
+                      (selectedPayment == 'GCash' &&
+                          gcashRefController.text.isEmpty)) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text("Please fill out all fields."),
+                        content: Text("Please complete all required fields."),
                       ),
                     );
                     return;
@@ -243,20 +294,17 @@ class _OrderFormState extends State<OrderForm> {
                   await saveOrder();
 
                   showDialog(
-                    // ignore: use_build_context_synchronously
                     context: context,
                     builder: (context) => AlertDialog(
                       title: const Text("Order Saved"),
                       content: Text(
-                        widget.existingOrder != null
-                            ? "Order #${orderNumberController.text} updated."
-                            : "Order placed successfully!",
+                        "Order #${orderNumberController.text} has been saved.",
                       ),
                       actions: [
                         TextButton(
                           onPressed: () {
-                            Navigator.pop(context); // close dialog
-                            Navigator.pop(context); // go back to view screen
+                            Navigator.pop(context);
+                            Navigator.pop(context);
                           },
                           child: const Text("OK"),
                         ),

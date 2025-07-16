@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderForm extends StatefulWidget {
   const OrderForm({super.key});
@@ -41,6 +43,33 @@ class _OrderFormState extends State<OrderForm> {
     netPrice = price - discount;
   }
 
+  Future<void> saveOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    Map<String, dynamic> orderData = {
+      'date': selectedDate.toIso8601String(),
+      'payment': selectedPayment,
+      'orderNumber': orderNumberController.text,
+      'customerName': customerNameController.text,
+      'mainFlavor': selectedMainFlavor,
+      'size': selectedSize,
+      'additionalFlavor': selectedAdditionalFlavor,
+      'price': double.tryParse(priceController.text) ?? 0,
+      'discount': discount,
+      'netPrice': netPrice,
+    };
+
+    final String? existingOrders = prefs.getString('taho_orders');
+    List<Map<String, dynamic>> orderList = [];
+
+    if (existingOrders != null) {
+      orderList = List<Map<String, dynamic>>.from(jsonDecode(existingOrders));
+    }
+
+    orderList.add(orderData);
+    await prefs.setString('taho_orders', jsonEncode(orderList));
+  }
+
   @override
   Widget build(BuildContext context) {
     calculatePrices();
@@ -50,11 +79,9 @@ class _OrderFormState extends State<OrderForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Date
           Text("Date: ${DateFormat.yMd().format(selectedDate)}"),
           const SizedBox(height: 10),
 
-          // Payment Method
           Text("Payment Method:"),
           Row(
             children: [
@@ -77,13 +104,11 @@ class _OrderFormState extends State<OrderForm> {
             ],
           ),
 
-          // Order Number
           TextField(
             controller: orderNumberController,
             decoration: InputDecoration(labelText: 'Order Number'),
           ),
 
-          // Customer Name
           TextField(
             controller: customerNameController,
             decoration: InputDecoration(labelText: 'Customer Name'),
@@ -95,7 +120,6 @@ class _OrderFormState extends State<OrderForm> {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
 
-          // Main Flavor
           DropdownButtonFormField(
             value: selectedMainFlavor,
             decoration: InputDecoration(labelText: "Main Flavor"),
@@ -110,7 +134,6 @@ class _OrderFormState extends State<OrderForm> {
             },
           ),
 
-          // Size
           DropdownButtonFormField(
             value: selectedSize,
             decoration: InputDecoration(labelText: "Size"),
@@ -122,7 +145,6 @@ class _OrderFormState extends State<OrderForm> {
             },
           ),
 
-          // Additional Flavor
           DropdownButtonFormField(
             value: selectedAdditionalFlavor,
             decoration: InputDecoration(labelText: "Additional Flavor"),
@@ -140,7 +162,6 @@ class _OrderFormState extends State<OrderForm> {
           const SizedBox(height: 20),
           Text("Pricing", style: TextStyle(fontWeight: FontWeight.bold)),
 
-          // Price
           TextField(
             controller: priceController,
             keyboardType: TextInputType.number,
@@ -154,19 +175,28 @@ class _OrderFormState extends State<OrderForm> {
 
           const SizedBox(height: 10),
 
-          // Discount and Net Price
           Text("SC/PWD Discount (20%): ₱${discount.toStringAsFixed(2)}"),
           Text("Net Price: ₱${netPrice.toStringAsFixed(2)}"),
 
           const SizedBox(height: 20),
 
-          // Submit Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                // Simulate submission (you can integrate saving logic here)
+              onPressed: () async {
+                if (orderNumberController.text.isEmpty ||
+                    customerNameController.text.isEmpty ||
+                    priceController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Please fill out all fields.")),
+                  );
+                  return;
+                }
+
+                await saveOrder();
+
                 showDialog(
+                  // ignore: use_build_context_synchronously
                   context: context,
                   builder: (context) => AlertDialog(
                     title: Text("Order Submitted"),
@@ -179,6 +209,17 @@ class _OrderFormState extends State<OrderForm> {
                     ],
                   ),
                 );
+
+                // Clear fields
+                setState(() {
+                  orderNumberController.clear();
+                  customerNameController.clear();
+                  priceController.clear();
+                  selectedMainFlavor = 'Classic';
+                  selectedSize = 'Small';
+                  selectedAdditionalFlavor = 'None';
+                  selectedPayment = 'Cash';
+                });
               },
               child: Text("PLACE TAHO ORDER"),
             ),

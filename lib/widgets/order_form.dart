@@ -294,6 +294,7 @@ class _OrderFormState extends State<OrderForm> {
                   await saveOrder();
 
                   showDialog(
+                    // ignore: use_build_context_synchronously
                     context: context,
                     builder: (context) => AlertDialog(
                       title: const Text("Order Saved"),

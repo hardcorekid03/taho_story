@@ -34,7 +34,7 @@ class MenuScreen extends StatelessWidget {
           children: [
             // 🖼️ Header Image
             Image.asset(
-              'assets/images/taho_banner.jpg',
+              'assets/images/banner.jpg',
               width: double.infinity,
               height: 180,
               fit: BoxFit.cover,

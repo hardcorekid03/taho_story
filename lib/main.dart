@@ -12,7 +12,7 @@ class TahoStoryApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Taho Story',
-      theme: ThemeData(primarySwatch: Colors.orange),
+      theme: ThemeData(fontFamily: 'HarmonyOS', primarySwatch: Colors.orange),
       home: HomeScreen(),
     );
   }

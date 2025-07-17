@@ -12,80 +12,95 @@ class MenuScreen extends StatelessWidget {
       'price': 110,
       'image': '/assets/images/klasikong_taho.jpg',
       'isClassic': true,
+      'description': 'Traditional warm taho with fresh arnibal and sago.'
     },
     {
       'name': 'BANANANUT',
       'price': 121,
       'image': '/assets/images/banananut.jpg',
+      'description': 'A nutty banana twist on the classic taho.'
     },
     {
       'name': 'UBE DE LECHE',
       'price': 122,
       'image': '/assets/images/ube_de_leche.jpg',
       'badge': 'Popular',
+      'description': 'Creamy ube flavor with a rich leche drizzle.'
     },
     {
       'name': 'LA PRESAS',
       'price': 123,
       'image': '/assets/images/la_presas.jpg',
+      'description': 'Sweet and tangy strawberry-infused taho.'
     },
     {
       'name': 'OREOHOLIC',
       'price': 124,
       'image': '/assets/images/oreoholic.jpg',
       'badge': 'Bestseller',
+      'description': 'Crunchy Oreo bits on silky taho base.'
     },
     {
       'name': 'PRUTAS OVERLOAD',
       'price': 125,
       'image': '/assets/images/prutas_overload.jpg',
+      'description': 'Topped with a mix of fresh seasonal fruits.'
     },
     {
       'name': 'AVOCADO LOCO',
       'price': 126,
       'image': '/assets/images/avocado_loco_2.jpg',
+      'description': 'Luscious avocado cream meets taho goodness.'
     },
     {
       'name': 'MANGGA GRAHAM',
       'price': 127,
       'image': '/assets/images/mangga_graham.jpg',
       'badge': 'New',
+      'description': 'Mango and graham combo with a taho twist.'
     },
     {
       'name': 'COFFEE GELMOND',
       'price': 128,
       'image': '/assets/images/coffee_gelmond.jpg',
+      'description': 'Coffee taho layered with almond jelly.'
     },
     {
       'name': 'DIRTY MATCHARLIE',
       'price': 129,
       'image': '/assets/images/dirty_matcharlie.jpg',
+      'description': 'Bold matcha mixed with chocolatey taho.'
     },
     {
       'name': 'SALTED CARAMEL',
       'price': 130,
       'image': '/assets/images/salted_caramel.jpg',
+      'description': 'Sweet and salty caramel blend on warm taho.'
     },
     {
       'name': 'ESTRAWBERRY COFFEE',
       'price': 131,
       'image': '/assets/images/estraberry_coffee.jpg',
+      'description': 'A unique fusion of strawberry and coffee flavors.'
     },
     {
       'name': 'SPICED MICO LATTE',
       'price': 132,
       'image': '/assets/images/spice_mico_latte.jpg',
+      'description': 'Taho infused with aromatic spiced latte blend.'
     },
     {
       'name': 'SALTED BANOFFEE JOSH',
       'price': 133,
       'image': '/assets/images/salted_banoffee_josh.jpg',
+      'description': 'Banana, toffee, and a hint of salt in creamy taho.'
     },
     {
       'name': "PAU'S BISCOFF",
       'price': 134,
       'image': '/assets/images/paus_biscoff.jpg',
       'badge': 'Premium',
+      'description': 'Premium Biscoff spread layered on smooth taho.'
     },
   ];
 
@@ -164,68 +179,6 @@ class MenuScreen extends StatelessWidget {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF8F0),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFFFF8C42).withAlpha((0.2 * 255).toInt()),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Available Sizes',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF8B4513),
-                        ),
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 8,
-                    children: ['MC-B1T1', 'MM', 'M'].map((size) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFF8C42)
-                              .withAlpha((0.1 * 255).toInt()),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFFFF8C42)
-                                .withAlpha((0.3 * 255).toInt()),
-                          ),
-                        ),
-                        child: Text(
-                          size,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFFF8C42),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'MC-B1T1: Buy 1 Take 1 • MM: Medium • M: Small',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 20)),
         ],
       ),
     );
@@ -298,54 +251,49 @@ class MenuScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          flavor['name'],
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF8B4513),
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '₱${flavor['price']}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFFF8C42),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF8C42)
-                                    .withAlpha((0.1 * 255).toInt()),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.add,
-                                size: 16,
-                                color: Color(0xFFFF8C42),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                const SizedBox(height: 8),
+                Text(
+                  flavor['name'],
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  '₱${flavor['price']}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFFF8C42),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (flavor['description'] != null)
+                  Text(
+                    flavor['description'],
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.black87,
+                    ),
+                  ),
+                const SizedBox(height: 4),
+                Row(
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.only(right: 6),
+                      child: _SizeBadge(label: 'MC-B1T1'),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 6),
+                      child: _SizeBadge(label: 'MM'),
+                    ),
+                    _SizeBadge(label: 'M'),
+                  ],
+                ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -369,5 +317,30 @@ class MenuScreen extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+}
+
+class _SizeBadge extends StatelessWidget {
+  final String label;
+
+  const _SizeBadge({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: Color(0xFFFF8C42)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 8,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFFF8C42),
+        ),
+      ),
+    );
   }
 }

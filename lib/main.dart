@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'screens/main_screen.dart';
 
 void main() {
-  runApp(TahoStoryApp());
+  runApp(const TahoStoryApp());
 }
 
 class TahoStoryApp extends StatelessWidget {
@@ -12,8 +12,30 @@ class TahoStoryApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Taho Story',
-      theme: ThemeData(fontFamily: 'HarmonyOS', primarySwatch: Colors.orange),
-      home: HomeScreen(),
+      theme: ThemeData(
+        useMaterial3: true,
+        fontFamily: 'HarmonyOS Sans',
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFFF8C42), // Warm orange
+          brightness: Brightness.light,
+        ),
+        cardTheme: CardThemeData(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          ),
+        ),
+      ),
+      home: const MainScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

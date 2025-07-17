@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/services.dart';
 
 class OrderForm extends StatefulWidget {
   final Map<String, dynamic>? existingOrder;
@@ -25,6 +25,7 @@ class _OrderFormState extends State<OrderForm> {
   String selectedSize = 'MC-B1T1';
   String selectedTakeOneFlavor = 'KLASIKONG TAHO';
   bool isBuyOneTakeOne = false;
+  bool applyDiscount = false;
 
   double discount = 0.0;
   double netPrice = 0.0;
@@ -65,6 +66,7 @@ class _OrderFormState extends State<OrderForm> {
       selectedTakeOneFlavor = order['takeOneFlavor'] ?? flavors[0];
       priceController.text = order['price'].toString();
       gcashRefController.text = order['gcashRef'] ?? '';
+      applyDiscount = order['applyDiscount'] ?? false;
     } else {
       autoGenerateOrderNumber();
     }
@@ -72,7 +74,7 @@ class _OrderFormState extends State<OrderForm> {
 
   void calculatePrices() {
     double price = double.tryParse(priceController.text) ?? 0;
-    discount = price * 0.20;
+    discount = applyDiscount ? price * 0.20 : 0.0;
     netPrice = price - discount;
   }
 
@@ -108,6 +110,7 @@ class _OrderFormState extends State<OrderForm> {
       'price': double.tryParse(priceController.text) ?? 0,
       'discount': discount,
       'netPrice': netPrice,
+      'applyDiscount': applyDiscount,
     };
 
     final String? existingOrders = prefs.getString('taho_orders');
@@ -130,20 +133,26 @@ class _OrderFormState extends State<OrderForm> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("Enter GCash Reference Number"),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text("Enter GCash Reference Number"),
         content: TextField(
           controller: gcashRefController,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(hintText: "e.g., 123456789012"),
+          decoration: const InputDecoration(
+            hintText: "e.g., 123456789012",
+            border: OutlineInputBorder(),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Cancel"),
+            child: const Text("Cancel"),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Save"),
+            child: const Text("Save"),
           ),
         ],
       ),
@@ -154,155 +163,347 @@ class _OrderFormState extends State<OrderForm> {
   Widget build(BuildContext context) {
     calculatePrices();
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Date: ${DateFormat.yMd().format(selectedDate)}"),
-            const SizedBox(height: 10),
-
-            Text("Payment Method:"),
-            Row(
-              children: [
-                Radio(
-                  value: 'Cash',
-                  groupValue: selectedPayment,
-                  onChanged: (value) {
-                    setState(() => selectedPayment = value.toString());
-                  },
-                ),
-                const Text('Cash'),
-                Radio(
-                  value: 'GCash',
-                  groupValue: selectedPayment,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedPayment = value.toString();
-                      showGCashDialog();
-                    });
-                  },
-                ),
-                const Text('GCash'),
-              ],
-            ),
-
-            TextField(
-              controller: orderNumberController,
-              readOnly: true,
-              decoration: const InputDecoration(labelText: 'Order Number'),
-            ),
-
-            TextField(
-              controller: customerNameController,
-              decoration: const InputDecoration(labelText: 'Customer Name'),
-            ),
-
-            const SizedBox(height: 20),
-            const Text(
-              "Product Details",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-
-            DropdownButtonFormField(
-              value: selectedMainFlavor,
-              decoration: const InputDecoration(labelText: "Main Flavor"),
-              items: flavors.map((flavor) {
-                return DropdownMenuItem(value: flavor, child: Text(flavor));
-              }).toList(),
-              onChanged: (value) {
-                setState(() => selectedMainFlavor = value.toString());
-              },
-            ),
-
-            DropdownButtonFormField(
-              value: selectedSize,
-              decoration: const InputDecoration(labelText: "Size"),
-              items: sizes.map((size) {
-                return DropdownMenuItem(value: size, child: Text(size));
-              }).toList(),
-              onChanged: (value) {
-                setState(() => selectedSize = value.toString());
-              },
-            ),
-
-            SwitchListTile(
-              title: const Text("Buy 1 Take 1"),
-              value: isBuyOneTakeOne,
-              onChanged: (value) {
-                setState(() {
-                  isBuyOneTakeOne = value;
-                });
-              },
-            ),
-
-            if (isBuyOneTakeOne)
-              DropdownButtonFormField(
-                value: selectedTakeOneFlavor,
-                decoration: const InputDecoration(labelText: "Take 1 Flavor"),
-                items: flavors.map((flavor) {
-                  return DropdownMenuItem(value: flavor, child: Text(flavor));
-                }).toList(),
-                onChanged: (value) {
-                  setState(() => selectedTakeOneFlavor = value.toString());
-                },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Date Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.calendar_today, color: Color(0xFFFF8C42)),
+                  const SizedBox(width: 12),
+                  Text(
+                    "Date: ${DateFormat.yMd().format(selectedDate)}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-
-            const SizedBox(height: 20),
-            const Text(
-              "Pricing",
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
+          ),
+          const SizedBox(height: 16),
 
-            TextField(
-              controller: priceController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-              decoration: const InputDecoration(labelText: "Price (₱)"),
-              onChanged: (value) {
-                setState(() {
-                  calculatePrices();
-                });
-              },
-            ),
-
-            const SizedBox(height: 10),
-            Text("SC/PWD Discount (20%): ₱${discount.toStringAsFixed(2)}"),
-            Text("Net Price: ₱${netPrice.toStringAsFixed(2)}"),
-
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (orderNumberController.text.isEmpty ||
-                      customerNameController.text.isEmpty ||
-                      priceController.text.isEmpty ||
-                      (selectedPayment == 'GCash' &&
-                          gcashRefController.text.isEmpty)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please complete all required fields."),
+          // Payment Method
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Payment Method",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile(
+                          value: 'Cash',
+                          groupValue: selectedPayment,
+                          onChanged: (value) {
+                            setState(() => selectedPayment = value.toString());
+                          },
+                          title: const Text('Cash'),
+                          activeColor: const Color(0xFFFF8C42),
+                          contentPadding: EdgeInsets.zero,
+                        ),
                       ),
-                    );
-                    return;
-                  }
+                      Expanded(
+                        child: RadioListTile(
+                          value: 'GCash',
+                          groupValue: selectedPayment,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedPayment = value.toString();
+                              showGCashDialog();
+                            });
+                          },
+                          title: const Text('GCash'),
+                          activeColor: const Color(0xFFFF8C42),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
 
-                  await saveOrder();
+          // Order Details
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Order Details",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: orderNumberController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Order Number',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.receipt),
+                      isDense: true,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: customerNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Customer Name',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person),
+                      isDense: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
 
+          // Product Details
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Product Details",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField(
+                    value: selectedMainFlavor,
+                    decoration: const InputDecoration(
+                      labelText: "Main Flavor",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.local_drink),
+                      isDense: true,
+                    ),
+                    items: flavors.map((flavor) {
+                      return DropdownMenuItem(
+                          value: flavor, child: Text(flavor));
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() => selectedMainFlavor = value.toString());
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField(
+                    value: selectedSize,
+                    decoration: const InputDecoration(
+                      labelText: "Size",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.straighten),
+                      isDense: true,
+                    ),
+                    items: sizes.map((size) {
+                      return DropdownMenuItem(value: size, child: Text(size));
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() => selectedSize = value.toString());
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    title: const Text("Buy 1 Take 1"),
+                    value: isBuyOneTakeOne,
+                    onChanged: (value) {
+                      setState(() {
+                        isBuyOneTakeOne = value;
+                      });
+                    },
+                    activeColor: const Color(0xFFFF8C42),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  if (isBuyOneTakeOne) ...[
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField(
+                      value: selectedTakeOneFlavor,
+                      decoration: const InputDecoration(
+                        labelText: "Take 1 Flavor",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.add_circle),
+                        isDense: true,
+                      ),
+                      items: flavors.map((flavor) {
+                        return DropdownMenuItem(
+                            value: flavor, child: Text(flavor));
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(
+                            () => selectedTakeOneFlavor = value.toString());
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Pricing
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Pricing",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: priceController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d{0,2}')),
+                    ],
+                    decoration: const InputDecoration(
+                      labelText: "Price (₱)",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.attach_money),
+                      isDense: true,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        calculatePrices();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  CheckboxListTile(
+                    title: const Text("Apply SC/PWD Discount (20%)"),
+                    subtitle: const Text(
+                        "For Senior Citizens & Persons with Disabilities"),
+                    value: applyDiscount,
+                    onChanged: (value) {
+                      setState(() {
+                        applyDiscount = value ?? false;
+                        calculatePrices();
+                      });
+                    },
+                    activeColor: const Color(0xFFFF8C42),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF8F0),
+                      borderRadius: BorderRadius.circular(8),
+                      // ignore: deprecated_member_use
+                      border: Border.all(
+                          // ignore: deprecated_member_use
+                          color: const Color(0xFFFF8C42).withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Original Price:"),
+                            Text(
+                                "₱${(double.tryParse(priceController.text) ?? 0).toStringAsFixed(2)}"),
+                          ],
+                        ),
+                        if (applyDiscount) ...[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text("SC/PWD Discount (20%):"),
+                              Text("-₱${discount.toStringAsFixed(2)}",
+                                  style: const TextStyle(color: Colors.green)),
+                            ],
+                          ),
+                        ],
+                        const Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Net Price:",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Text(
+                              "₱${netPrice.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFFF8C42),
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Submit Button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: () async {
+                if (orderNumberController.text.isEmpty ||
+                    customerNameController.text.isEmpty ||
+                    priceController.text.isEmpty ||
+                    (selectedPayment == 'GCash' &&
+                        gcashRefController.text.isEmpty)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          const Text("Please complete all required fields."),
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                await saveOrder();
+
+                if (mounted) {
                   showDialog(
                     // ignore: use_build_context_synchronously
                     context: context,
                     builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       title: const Text("Order Saved"),
                       content: Text(
-                        "Order #${orderNumberController.text} has been saved.",
+                        "Order #${orderNumberController.text} has been saved successfully!",
                       ),
                       actions: [
-                        TextButton(
+                        ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context);
                             Navigator.pop(context);
@@ -312,16 +513,28 @@ class _OrderFormState extends State<OrderForm> {
                       ],
                     ),
                   );
-                },
-                child: Text(
-                  widget.existingOrder != null
-                      ? "UPDATE ORDER"
-                      : "PLACE TAHO ORDER",
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF8C42),
+                foregroundColor: Colors.white,
+                elevation: 8,
+                // ignore: deprecated_member_use
+                shadowColor: const Color(0xFFFF8C42).withOpacity(0.4),
+              ),
+              child: Text(
+                widget.existingOrder != null
+                    ? "UPDATE ORDER"
+                    : "PLACE TAHO ORDER",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 32), // Extra bottom padding for safe area
+        ],
       ),
     );
   }

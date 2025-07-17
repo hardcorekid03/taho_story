@@ -56,7 +56,7 @@ assets/
 
 ```bash
 git clone https://github.com/hardcorekid03/taho_story.git
-cd taho-story
+cd taho_story
 ```
 
 2. **Get dependencies**

@@ -61,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Local Flavor, Local Heart',
+                          'Taho with ice cream? Bakit hindi?!',
                           style: Theme.of(context)
                               .textTheme
                               .headlineSmall

@@ -68,9 +68,20 @@ class ProfileScreen extends StatelessWidget {
               title: 'Social Media',
               subtitle: 'Follow us on social media',
               children: const [
-                ListTile(title: Text('Facebook: @TahoStory')),
-                ListTile(title: Text('Instagram: @taho.story')),
-                ListTile(title: Text('TikTok: @taho_story_official')),
+                ListTile(
+                  leading: Icon(Icons.facebook, color: Color(0xFF1877F2)),
+                  title: Text('Facebook: @TahoStory'),
+                ),
+                ListTile(
+                  leading: Icon(Icons.camera_alt_outlined,
+                      color: Color(0xFFC13584)), // Instagram
+                  title: Text('Instagram: @taho.story'),
+                ),
+                ListTile(
+                  leading: Icon(Icons.music_note,
+                      color: Color(0xFF010101)), // TikTok
+                  title: Text('TikTok: @taho_story_official'),
+                ),
               ],
             ),
             _buildExpandableMenuItem(
@@ -78,8 +89,14 @@ class ProfileScreen extends StatelessWidget {
               title: 'Contact Us',
               subtitle: 'Get in touch with us',
               children: const [
-                ListTile(title: Text('Phone: +63 912 345 6789')),
-                ListTile(title: Text('Email: support@tahostory.ph')),
+                ListTile(
+                  leading: Icon(Icons.phone, color: Colors.green),
+                  title: Text('Phone: +63 912 345 6789'),
+                ),
+                ListTile(
+                  leading: Icon(Icons.email_outlined, color: Colors.orange),
+                  title: Text('Email: support@tahostory.ph'),
+                ),
               ],
             ),
             _buildExpandableMenuItem(
@@ -87,8 +104,15 @@ class ProfileScreen extends StatelessWidget {
               title: 'Help & Support',
               subtitle: 'Get help with your orders',
               children: const [
-                ListTile(title: Text('FAQs')),
-                ListTile(title: Text('Report an Issue')),
+                ListTile(
+                  leading: Icon(Icons.help_outline, color: Colors.blue),
+                  title: Text('FAQs'),
+                ),
+                ListTile(
+                  leading:
+                      Icon(Icons.report_problem_outlined, color: Colors.red),
+                  title: Text('Report an Issue'),
+                ),
               ],
             ),
             _buildExpandableMenuItem(
@@ -97,10 +121,21 @@ class ProfileScreen extends StatelessWidget {
               subtitle: 'Learn more about Taho Story',
               children: const [
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                   child: Text(
-                    'Founded by friends with a playful name suggestion from a child—“Taho Story”—this dessert startup launched its first store on April 29, 2024, at the University of the Philippines Diliman campus. They began with a bold idea: blending traditional tahô with ice cream and chilled flavors, introducing varieties like Ube de Leche, Avocado Loco, Mangga Graham, and more. As demand surged, they rapidly expanded, entering franchising after just one month and growing from 33 branches early in 2025 to aiming for 200–250 nationwide by year-end. Through colorful flavors, smart branding, and the tagline “Bakit Hindi?”, Taho Story has reimagined a nostalgic Filipino favorite into a modern treat that brings people together over sweet, creamy cups.',
-                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                    'Founded by friends with a playful name suggestion from a child—'
+                    '“Taho Story”—this dessert startup launched its first store on April 29, 2024, '
+                    'at the University of the Philippines Diliman2 campus.\n\n'
+                    'They began with a bold idea: blending traditional tahô with ice cream and chilled flavors, '
+                    'introducing varieties like Ube de Leche, Avocado Loco, Mangga Graham, and more.\n\n'
+                    'As demand surged, they rapidly expanded—entering franchising after just one month and growing '
+                    'from 33 branches early in 2025 to aiming for 200–250 nationwide by year-end.\n\n'
+                    'Through colorful flavors, smart branding, and the tagline “Bakit Hindi?”, Taho Story has reimagined '
+                    'a nostalgic Filipino favorite into a modern treat that brings people together over sweet, creamy cups.',
+                    style: TextStyle(
+                        fontSize: 14, color: Colors.black87, height: 1.5),
+                    textAlign: TextAlign.justify,
                   ),
                 ),
               ],

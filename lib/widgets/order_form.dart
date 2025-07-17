@@ -263,6 +263,9 @@ class _OrderFormState extends State<OrderForm> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: customerNameController,
+                    inputFormatters: [
+                      UpperCaseTextFormatter(),
+                    ],
                     decoration: const InputDecoration(
                       labelText: 'Customer Name',
                       border: OutlineInputBorder(),
@@ -536,6 +539,19 @@ class _OrderFormState extends State<OrderForm> {
           const SizedBox(height: 32), // Extra bottom padding for safe area
         ],
       ),
+    );
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return newValue.copyWith(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }

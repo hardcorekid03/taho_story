@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -101,7 +103,6 @@ class MenuScreen extends StatelessWidget {
       ),
       body: CustomScrollView(
         slivers: [
-          // Header Section
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.all(16),
@@ -128,15 +129,13 @@ class MenuScreen extends StatelessWidget {
                   Text(
                     'Choose from our delicious selection',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          // ignore: deprecated_member_use
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withAlpha((0.9 * 255).toInt()),
                         ),
                   ),
                 ],
               ),
             ),
           ),
-          // Flavors Grid
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverGrid(
@@ -149,13 +148,22 @@ class MenuScreen extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final flavor = flavors[index];
-                  return _buildFlavorCard(context, flavor);
+                  return AnimationConfiguration.staggeredGrid(
+                    position: index,
+                    columnCount: 2,
+                    duration: const Duration(milliseconds: 300),
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: _buildFlavorCard(context, flavor),
+                      ),
+                    ),
+                  );
                 },
                 childCount: flavors.length,
               ),
             ),
           ),
-          // Sizes Section
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.all(16),
@@ -164,8 +172,7 @@ class MenuScreen extends StatelessWidget {
                 color: const Color(0xFFFFF8F0),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  // ignore: deprecated_member_use
-                  color: const Color(0xFFFF8C42).withOpacity(0.2),
+                  color: const Color(0xFFFF8C42).withAlpha((0.2 * 255).toInt()),
                 ),
               ),
               child: Column(
@@ -187,12 +194,12 @@ class MenuScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          // ignore: deprecated_member_use
-                          color: const Color(0xFFFF8C42).withOpacity(0.1),
+                          color: const Color(0xFFFF8C42)
+                              .withAlpha((0.1 * 255).toInt()),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            // ignore: deprecated_member_use
-                            color: const Color(0xFFFF8C42).withOpacity(0.3),
+                            color: const Color(0xFFFF8C42)
+                                .withAlpha((0.3 * 255).toInt()),
                           ),
                         ),
                         child: Text(
@@ -218,9 +225,7 @@ class MenuScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 20),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
         ],
       ),
     );
@@ -230,33 +235,27 @@ class MenuScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
-        // Add tap animation or navigation
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         child: Card(
           elevation: 6,
-          // ignore: deprecated_member_use
-          shadowColor: const Color(0xFFFF8C42).withOpacity(0.2),
+          shadowColor: const Color(0xFFFF8C42).withAlpha((0.2 * 255).toInt()),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white,
-                  const Color(0xFFFFF8F0),
-                ],
+                colors: [Colors.white, Color(0xFFFFF8F0)],
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image and Badge
                 Expanded(
                   flex: 3,
                   child: Stack(
@@ -281,9 +280,7 @@ class MenuScreen extends StatelessWidget {
                           right: 8,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: _getBadgeColor(flavor['badge']),
                               borderRadius: BorderRadius.circular(12),
@@ -301,7 +298,6 @@ class MenuScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Content
                 Expanded(
                   flex: 2,
                   child: Padding(
@@ -334,8 +330,8 @@ class MenuScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                // ignore: deprecated_member_use
-                                color: const Color(0xFFFF8C42).withOpacity(0.1),
+                                color: const Color(0xFFFF8C42)
+                                    .withAlpha((0.1 * 255).toInt()),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(

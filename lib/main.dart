@@ -16,7 +16,7 @@ class TahoStoryApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'HarmonyOS Sans',
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFF8C42), // Warm orange
+          seedColor: const Color(0xFFFF8C42),
           brightness: Brightness.light,
         ),
         cardTheme: CardThemeData(
@@ -32,6 +32,12 @@ class TahoStoryApp extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           ),
+        ),
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          },
         ),
       ),
       home: const MainScreen(),

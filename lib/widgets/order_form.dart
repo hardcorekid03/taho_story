@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../screens/data/menu_items.dart';
+import '../widgets/dialogs/gcash_dialog.dart';
 
 class OrderForm extends StatefulWidget {
   final Map<String, dynamic>? existingOrder;
@@ -30,24 +32,6 @@ class _OrderFormState extends State<OrderForm> {
   double discount = 0.0;
   double netPrice = 0.0;
   DateTime selectedDate = DateTime.now();
-
-  final List<String> flavors = [
-    'KLASIKONG TAHO',
-    'BANANANUT',
-    'UBE DE LECHE',
-    'LA PRESAS',
-    'OREOHOLIC',
-    'PRUTAS OVERLOAD',
-    'AVOCADO LOCO',
-    'MANGGA GRAHAM',
-    'COFFEE GELMOND',
-    'DIRTY MATCHARLIE',
-    'SALTED CARAMEL',
-    'ESTRAWBERRY COFFEE',
-    'SPICED MICO LATTE',
-    'SALTED BANOFFEE JOSH',
-    "PAU'S BISCOFF",
-  ];
 
   final List<String> sizes = ['MC-B1T1', 'MM', 'M'];
 
@@ -129,36 +113,6 @@ class _OrderFormState extends State<OrderForm> {
     await prefs.setString('taho_orders', jsonEncode(orderList));
   }
 
-  void showGCashDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: const Text("Enter GCash Reference Number"),
-        content: TextField(
-          controller: gcashRefController,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            hintText: "e.g., 123456789012",
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Save"),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     calculatePrices();
@@ -222,7 +176,9 @@ class _OrderFormState extends State<OrderForm> {
                           onChanged: (value) {
                             setState(() {
                               selectedPayment = value.toString();
-                              showGCashDialog();
+                              showGCashDialog(
+                                  context: context,
+                                  controller: gcashRefController);
                             });
                           },
                           title: const Text('GCash'),
@@ -300,8 +256,11 @@ class _OrderFormState extends State<OrderForm> {
                       isDense: true,
                     ),
                     items: flavors.map((flavor) {
+                      final name = flavor['name'] as String;
                       return DropdownMenuItem(
-                          value: flavor, child: Text(flavor));
+                        value: name,
+                        child: Text(name),
+                      );
                     }).toList(),
                     onChanged: (value) {
                       setState(() => selectedMainFlavor = value.toString());
@@ -346,8 +305,11 @@ class _OrderFormState extends State<OrderForm> {
                         isDense: true,
                       ),
                       items: flavors.map((flavor) {
+                        final name = flavor['name'] as String;
                         return DropdownMenuItem(
-                            value: flavor, child: Text(flavor));
+                          value: name,
+                          child: Text(name),
+                        );
                       }).toList(),
                       onChanged: (value) {
                         setState(

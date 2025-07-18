@@ -16,67 +16,41 @@ class HomeScreen extends StatelessWidget {
             height: MediaQuery.of(context).size.height * 0.6,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage('/assets/images/banner.jpg'),
+                image: NetworkImage(
+                    '/assets/images/banner.jpg'), // Ensure this path is correct or use a placeholder
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          // Gradient Overlay
+          // Gradient Overlay (currently commented out in your original code, keeping it that way)
           Container(
             height: MediaQuery.of(context).size.height * 0.6,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withAlpha((0.3 * 255).toInt()),
-                  Colors.black.withAlpha((0.7 * 255).toInt()),
-                ],
-              ),
-            ),
+            decoration: const BoxDecoration(
+                // gradient: LinearGradient(
+                //   begin: Alignment.topCenter,
+                //   end: Alignment.bottomCenter,
+                //   colors: [
+                //     Colors.black.withAlpha((0.3 * 255).toInt()),
+                //     Colors.black.withAlpha((0.7 * 255).toInt()),
+                //   ],
+                // ),
+                ),
           ),
           // Content
           SafeArea(
             child: Column(
               children: [
-                // Header Text
+                // Header Text (empty in your original, keeping it that way)
                 Expanded(
                   flex: 3,
                   child: Container(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
+                    padding: const EdgeInsets.all(12),
+                    child: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Taho Story',
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayLarge
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 48,
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Taho with ice cream? Bakit hindi?!',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                // ignore: deprecated_member_use
-                                color: Colors.white.withOpacity(0.9),
-                                fontWeight: FontWeight.w300,
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
                     ),
                   ),
                 ),
-                // Action Cards
+                // Action Cards and new Promo Section
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -89,81 +63,100 @@ class HomeScreen extends StatelessWidget {
                         topRight: Radius.circular(32),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        // Glassmorphism Container
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF8F0),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              // ignore: deprecated_member_use
-                              color: const Color(0xFFFF8C42).withOpacity(0.2),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
+                    child: SingleChildScrollView(
+                      // Added SingleChildScrollView for scrollability
+                      child: Column(
+                        children: [
+                          // Glassmorphism Container for buttons
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF8F0),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
                                 // ignore: deprecated_member_use
-                                color: const Color(0xFFFF8C42).withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 8),
+                                color: const Color(0xFFFF8C42).withOpacity(0.2),
+                                width: 1,
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              _buildActionButton(
-                                context,
-                                'Place Order',
-                                Icons.add_shopping_cart,
-                                const Color(0xFFFF8C42),
-                                () => Navigator.push(
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      // ignore: deprecated_member_use
+                                      const Color(0xFFFF8C42).withOpacity(0.1),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                _buildActionButton(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const OrderFormScreen(),
+                                  'Place Order',
+                                  Icons.add_shopping_cart,
+                                  const Color(0xFFFF8C42),
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const OrderFormScreen(),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildSecondaryButton(
-                                      context,
-                                      'View Orders',
-                                      Icons.receipt_long_outlined,
-                                      () => Navigator.push(
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildSecondaryButton(
                                         context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ViewOrdersScreen(),
+                                        'View Orders',
+                                        Icons.receipt_long_outlined,
+                                        () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ViewOrdersScreen(),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: _buildSecondaryButton(
-                                      context,
-                                      'View Menu',
-                                      Icons.menu_book_outlined,
-                                      () => Navigator.push(
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: _buildSecondaryButton(
                                         context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const MenuScreen(),
+                                        'View Menu',
+                                        Icons.menu_book_outlined,
+                                        () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MenuScreen(),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(
+                              height: 8), // Space between buttons and promos
+                          Align(
+                            alignment: Alignment.centerLeft,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildPromoCard(
+                            context,
+                            'Free Delivery!',
+                            'For orders above ₱200.',
+                            '/assets/images/delivery.png',
+                            const Color(0xFFE8F5E9), // Light green background
+                            const Color(0xFFFF8C42), //  accent
+                          ),
+                          const SizedBox(height: 12), // Padding at the bottom
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -224,6 +217,71 @@ class HomeScreen extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+        ),
+      ),
+    );
+  }
+
+  // New widget for promo cards
+  Widget _buildPromoCard(
+    BuildContext context,
+    String title,
+    String description,
+    String imageUrl,
+    Color backgroundColor,
+    Color accentColor,
+  ) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      color: backgroundColor,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                // ignore: deprecated_member_use
+                color: accentColor.withOpacity(0.2),
+                image: DecorationImage(
+                  image: NetworkImage(imageUrl),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: accentColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: accentColor, size: 18),
+          ],
         ),
       ),
     );

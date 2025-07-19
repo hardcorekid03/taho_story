@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'order_form_screen.dart';
-import 'view_orders_screen.dart';
 import 'menu_screen.dart';
+import './data/menu_items.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,32 +16,21 @@ class HomeScreen extends StatelessWidget {
             height: MediaQuery.of(context).size.height * 0.6,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(
-                    '/assets/images/banner.jpg'), // Ensure this path is correct or use a placeholder
+                image: AssetImage('assets/images/banner.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
-          ),
-          // Gradient Overlay (currently commented out in your original code, keeping it that way)
-          Container(
-            height: MediaQuery.of(context).size.height * 0.6,
-            decoration: const BoxDecoration(),
           ),
           // Content
           SafeArea(
             child: Column(
               children: [
-                // Header Text (empty in your original, keeping it that way)
                 Expanded(
                   flex: 3,
                   child: Container(
                     padding: const EdgeInsets.all(12),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                    ),
                   ),
                 ),
-                // Action Cards and new Promo Section
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -55,33 +44,14 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     child: SingleChildScrollView(
-                      // Added SingleChildScrollView for scrollability
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Glassmorphism Container for buttons
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFF8F0),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                // ignore: deprecated_member_use
-                                color: const Color(0xFFFF8C42).withOpacity(0.2),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      // ignore: deprecated_member_use
-                                      const Color(0xFFFF8C42).withOpacity(0.1),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                _buildActionButton(
+                          // Action Buttons Row
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildActionButton(
                                   context,
                                   'Place Order',
                                   Icons.add_shopping_cart,
@@ -94,58 +64,58 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildSecondaryButton(
-                                        context,
-                                        'View Orders',
-                                        Icons.receipt_long_outlined,
-                                        () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ViewOrdersScreen(),
-                                          ),
-                                        ),
-                                      ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _buildOutlineButton(
+                                  context,
+                                  'View Menu',
+                                  Icons.restaurant_menu,
+                                  const Color(0xFFFF8C42),
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const MenuScreen(),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: _buildSecondaryButton(
-                                        context,
-                                        'View Menu',
-                                        Icons.menu_book_outlined,
-                                        () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MenuScreen(),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Popular Menu
+                          const Text(
+                            "Popular Menu",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFFF8C42),
                             ),
                           ),
-                          const SizedBox(
-                              height: 8), // Space between buttons and promos
-                          Align(
-                            alignment: Alignment.centerLeft,
-                          ),
                           const SizedBox(height: 12),
+                          SizedBox(
+                            height: 220,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 4,
+                              itemBuilder: (context, index) {
+                                final item = flavors[index];
+                                return _buildMenuItemCard(context, item);
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Promo Card
                           _buildPromoCard(
                             context,
                             'Free Delivery!',
                             'For orders above ₱200.',
-                            '/assets/images/delivery.png',
-                            const Color(0xFFE8F5E9), // Light green background
-                            const Color(0xFFFF8C42), //  accent
+                            'assets/images/delivery.png',
+                            const Color(0xFFE8F5E9),
+                            const Color(0xFFFF8C42),
                           ),
-                          const SizedBox(height: 12), // Padding at the bottom
                         ],
                       ),
                     ),
@@ -167,53 +137,119 @@ class HomeScreen extends StatelessWidget {
     VoidCallback onPressed,
   ) {
     return SizedBox(
-      width: double.infinity,
       height: 56,
       child: ElevatedButton.icon(
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
         label: Text(
           text,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         style: ElevatedButton.styleFrom(
+          side: BorderSide(color: color, width: 2),
           backgroundColor: color,
           foregroundColor: Colors.white,
           elevation: 8,
           // ignore: deprecated_member_use
           shadowColor: color.withOpacity(0.4),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSecondaryButton(
-    BuildContext context,
-    String text,
-    IconData icon,
-    VoidCallback onPressed,
-  ) {
-    return SizedBox(
-      height: 48,
-      child: OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 20),
-        label: Text(
-          text,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFFFF8C42),
-          side: const BorderSide(color: Color(0xFFFF8C42)),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
       ),
     );
   }
 
-  // New widget for promo cards
+  Widget _buildOutlineButton(
+    BuildContext context,
+    String text,
+    IconData icon,
+    Color color,
+    VoidCallback onPressed,
+  ) {
+    return SizedBox(
+      height: 56,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 24, color: color),
+        label: Text(
+          text,
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.w600, color: color),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: color, width: 2),
+          foregroundColor: color,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItemCard(BuildContext context, Map<String, dynamic> item) {
+    return Container(
+      width: 160,
+      margin: const EdgeInsets.only(right: 12),
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
+              child: Image.network(
+                item['image'],
+                height: 100,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item['name'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '₱${item['price']}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFFFF8C42),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  if (item['description'] != null)
+                    Text(
+                      item['description'],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPromoCard(
     BuildContext context,
     String title,
@@ -223,7 +259,7 @@ class HomeScreen extends StatelessWidget {
     Color accentColor,
   ) {
     return Card(
-      elevation: 4,
+      elevation: 6,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -240,7 +276,7 @@ class HomeScreen extends StatelessWidget {
                 // ignore: deprecated_member_use
                 color: accentColor.withOpacity(0.2),
                 image: DecorationImage(
-                  image: NetworkImage(imageUrl),
+                  image: AssetImage(imageUrl),
                   fit: BoxFit.cover,
                 ),
               ),

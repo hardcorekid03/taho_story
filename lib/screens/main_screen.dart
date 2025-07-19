@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'view_orders_screen.dart';
 import 'profile_screen.dart';
+import 'about.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,6 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const ViewOrdersScreen(),
+    const AboutScreen(), // 👈 Added About screen
     const ProfileScreen(),
   ];
 
@@ -24,6 +26,8 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeIn,
+        switchOutCurve: Curves.easeOut,
         child: _screens[_currentIndex],
       ),
       bottomNavigationBar: Container(
@@ -57,6 +61,11 @@ class _MainScreenState extends State<MainScreen> {
               icon: Icon(Icons.receipt_long_outlined),
               selectedIcon: Icon(Icons.receipt_long),
               label: 'Orders',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.info_outline),
+              selectedIcon: Icon(Icons.info),
+              label: 'About',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),

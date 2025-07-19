@@ -22,6 +22,7 @@ dev_dependencies:
   flutter_staggered_animations: ^1.1.1
 
 
+
 flutter:
   uses-material-design: true
 

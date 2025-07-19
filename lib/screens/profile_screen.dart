@@ -115,31 +115,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
-            _buildExpandableMenuItem(
-              icon: Icons.info_outline,
-              title: 'About',
-              subtitle: 'Learn more about Taho Story',
-              children: const [
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                  child: Text(
-                    'Founded by friends with a playful name suggestion from a child—'
-                    '“Taho Story”—this dessert startup launched its first store on April 29, 2024, '
-                    'at the University of the Philippines Diliman2 campus.\n\n'
-                    'They began with a bold idea: blending traditional tahô with ice cream and chilled flavors, '
-                    'introducing varieties like Ube de Leche, Avocado Loco, Mangga Graham, and more.\n\n'
-                    'As demand surged, they rapidly expanded—entering franchising after just one month and growing '
-                    'from 33 branches early in 2025 to aiming for 200–250 nationwide by year-end.\n\n'
-                    'Through colorful flavors, smart branding, and the tagline “Bakit Hindi?”, Taho Story has reimagined '
-                    'a nostalgic Filipino favorite into a modern treat that brings people together over sweet, creamy cups.',
-                    style: TextStyle(
-                        fontSize: 14, color: Colors.black87, height: 1.5),
-                    textAlign: TextAlign.justify,
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),

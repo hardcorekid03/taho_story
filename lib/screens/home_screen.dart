@@ -25,16 +25,7 @@ class HomeScreen extends StatelessWidget {
           // Gradient Overlay (currently commented out in your original code, keeping it that way)
           Container(
             height: MediaQuery.of(context).size.height * 0.6,
-            decoration: const BoxDecoration(
-                // gradient: LinearGradient(
-                //   begin: Alignment.topCenter,
-                //   end: Alignment.bottomCenter,
-                //   colors: [
-                //     Colors.black.withAlpha((0.3 * 255).toInt()),
-                //     Colors.black.withAlpha((0.7 * 255).toInt()),
-                //   ],
-                // ),
-                ),
+            decoration: const BoxDecoration(),
           ),
           // Content
           SafeArea(

@@ -7,7 +7,7 @@
 ## 📱 Features
 
 - 📝 Place Taho Orders with customer details
-- 🍮 Choose from a menu of 15+ custom flavors
+- 🍮 View menu with 10+custom flavors
 - 📦 Select product sizes (MC-B1T1, MM, M)
 - 🆓 Buy-One-Take-One flavor selection
 - 💰 Payment support: Cash or GCash
@@ -24,19 +24,27 @@
 ## 📂 Project Structure
 
 ```
-lib/
-├── main.dart
-├── screens/
-│   ├── home_screen.dart
-│   ├── order_form_screen.dart
-│   ├── view_orders_screen.dart
-│   └── menu_screen.dart
-├── widgets/
-│   └── order_form.dart
-├── helpers/
-│   └── order_builder.dart
-assets/
-└── fonts/ (HarmonyOS Sans)
+
+
+  lib/
+  └── screens/
+  ├── data/
+  │   └── menu_items.dart
+  ├── about.dart
+  ├── home_screen.dart
+  ├── main_screen.dart
+  ├── menu_screen.dart
+  ├── order_form_screen.dart
+  ├── orders_screen.dart
+  ├── profile_screen.dart
+  ├── view_orders_screen.dart
+  ├── widgets/
+  │ ├── dialogs/
+  │ │ └── gcash_dialog.dart
+  │ ├── menu_card.dart
+  │ └── order_form.dart
+  └── main.dart
+
 ```
 
 ---
@@ -78,7 +86,7 @@ flutter run
 - **Flutter** (Dart)
 - **shared_preferences** – for local storage
 - **intl** – for date formatting
-- **Google Fonts** *(replaced with HarmonyOS Sans)*
+- **HarmonyOS Sans** 
 - **Material Design 3**
 
 ---

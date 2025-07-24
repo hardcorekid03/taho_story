@@ -22,16 +22,13 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Gradient Overlay (currently commented out in your original code, keeping it that way)
           Container(
             height: MediaQuery.of(context).size.height * 0.6,
             decoration: const BoxDecoration(),
           ),
-          // Content
           SafeArea(
             child: Column(
               children: [
-                // Header Text (empty in your original, keeping it that way)
                 Expanded(
                   flex: 3,
                   child: Container(
@@ -41,7 +38,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Action Cards and new Promo Section
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -55,10 +51,8 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     child: SingleChildScrollView(
-                      // Added SingleChildScrollView for scrollability
                       child: Column(
                         children: [
-                          // Glassmorphism Container for buttons
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
